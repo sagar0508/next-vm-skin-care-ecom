@@ -1,0 +1,53 @@
+# Backend API Endpoints for VM Korean Skin Care
+
+## Authentication (Auth)
+- `POST /api/auth/register` - Create a new user account
+- `POST /api/auth/login` - Login user and get token
+- `POST /api/auth/logout` - Logout user
+- `POST /api/auth/refresh-token` - Refresh access token
+- `GET /api/auth/me` - Get current logged-in user details
+- `PUT /api/auth/profile` - Update user profile (name, avatar, phone)
+
+## Products
+- `GET /api/products` - Get all products (supports pagination, filtering by category, price, rating, sort)
+- `GET /api/products/search?q={query}` - Search products
+- `GET /api/products/{slug}` - Get single product details by slug or ID
+- `GET /api/products/featured` - Get featured products for home page
+- `GET /api/products/related/{id}` - Get related products
+- `GET /api/categories` - Get all categories tree
+
+## Cart (Optional - if syncing with server)
+- `GET /api/cart` - Get user's cart
+- `POST /api/cart/add` - Add item to cart
+- `PUT /api/cart/update` - Update item quantity
+- `DELETE /api/cart/remove/{productId}` - Remove item from cart
+- `DELETE /api/cart/clear` - Clear entire cart
+
+## Wishlist
+- `GET /api/wishlist` - Get user's wishlist
+- `POST /api/wishlist/toggle` - Add/Remove product from wishlist
+
+## Addresses
+- `GET /api/addresses` - Get user's saved addresses
+- `POST /api/addresses` - Add new address
+- `PUT /api/addresses/{id}` - Update address
+- `DELETE /api/addresses/{id}` - Delete address
+
+## Orders & Checkout
+- `POST /api/orders/create` - Create a new order (Initialize)
+- `POST /api/payment/razorpay/initiate` - Initiate Razorpay payment order
+- `POST /api/payment/razorpay/verify` - Verify Razorpay payment signature
+- `GET /api/orders` - Get user's order history
+- `GET /api/orders/{id}` - Get specific order details
+
+## Blog
+- `GET /api/blog` - Get all blog posts
+- `GET /api/blog/{slug}` - Get single blog post details
+
+## Reviews
+- `GET /api/reviews/{productId}` - Get reviews for a product
+- `POST /api/reviews` - Add a review (requires auth & verification usually)
+
+## Contact & Newsletter
+- `POST /api/contact` - Submit contact form
+- `POST /api/newsletter/subscribe` - Subscribe to newsletter

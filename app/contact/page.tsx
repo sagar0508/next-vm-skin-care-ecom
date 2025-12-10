@@ -61,11 +61,11 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-foreground">Visit Us</h3>
                     <p className="text-muted-foreground mt-1">
-                      1st Floor, Shree Ram Complex,
+                      line no .3, B-47,
                       <br />
-                      Nr Shubham Party Plot,
+                      virenpark-2, Deesa - Tharad Hwy,
                       <br />
-                      Deesa 385535
+                      Gujarat 385565, India
                     </p>
                   </div>
                 </div>
@@ -77,10 +77,10 @@ const Contact = () => {
                   <div>
                     <h3 className="font-semibold text-foreground">Call Us</h3>
                     <a
-                      href="tel:+911234567890"
+                      href="tel:+919928821756"
                       className="text-muted-foreground mt-1 hover:text-primary transition-colors"
                     >
-                      +91 123 456 7890
+                      +91 99288 21756
                     </a>
                   </div>
                 </div>
@@ -118,12 +118,26 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Map placeholder */}
-            <div className="bg-muted rounded-xl aspect-video flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <MapPin className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">Map will be displayed here</p>
-              </div>
+            {/* Map */}
+            <div className="bg-muted rounded-xl aspect-video overflow-hidden">
+              {/* <iframe
+                src="https://maps.app.goo.gl/RqnHpediujWyXcWP9"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe> */}
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d620372.8325047906!2d71.30915255927212!3d24.476997204589562!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395b5b9a6dd62375%3A0x903336241432c061!2sVm%20Korean%20treatment!5e1!3m2!1sen!2sus!4v1765339617682!5m2!1sen!2sus"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
 

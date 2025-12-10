@@ -5,6 +5,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  MessageCircle,
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import Link from "next/link";
@@ -33,22 +34,36 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="#"
+                href="https://www.facebook.com/people/VM-Korean-Glass-Treatement/61569783852868/?mibextid=wwXIfr&rdid=qrcLc3zzDgoV7X2v&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1EdMexCKc4%2F%3Fmibextid%3DwwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-background/70 hover:text-primary transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/vm_korean_glass_treatment/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-background/70 hover:text-primary transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.youtube.com/@vmskincare?si=Cf4R00_stXjvOAqK"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-background/70 hover:text-primary transition-colors"
               >
                 <Youtube className="h-5 w-5" />
+              </a>
+              <a
+                href="https://api.whatsapp.com/send/?phone=9928821756&text&type=phone_number&app_absent=0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-background/70 hover:text-primary transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -138,17 +153,17 @@ export function Footer() {
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 flex-shrink-0 mt-0.5 text-primary" />
                 <span>
-                  1st Floor, Shree Ram Complex, Nr Shubham Party Plot, Deesa
-                  385535
+                  line no .3, B-47, virenpark-2, Deesa - Tharad Hwy, Gujarat
+                  385565, India
                 </span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-5 w-5 flex-shrink-0 text-primary" />
                 <a
-                  href="tel:+911234567890"
+                  href="tel:+919928821756"
                   className="hover:text-primary transition-colors"
                 >
-                  +91 123 456 7890
+                  +91 99288 21756
                 </a>
               </li>
               <li className="flex items-center gap-2">

@@ -1,19 +1,19 @@
 "use client";
-import { Mail } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function Newsletter() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      toast.success('Subscribed successfully!', {
-        description: 'You\'ll receive updates at ' + email,
+      toast.success("Subscribed successfully!", {
+        description: "You'll receive updates at " + email,
       });
-      setEmail('');
+      setEmail("");
     }
   };
 
@@ -23,13 +23,17 @@ export function Newsletter() {
         <div className="max-w-2xl mx-auto text-center">
           <Mail className="h-12 w-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-3xl font-display font-bold">
-            Subscribe to Our Newsletter
+            Subscribe to Our Newsletter new
           </h2>
           <p className="mt-3 text-primary-foreground/80">
-            Get exclusive offers, new arrivals updates, and 10% off your first order!
+            Get exclusive offers, new arrivals updates, and 10% off your first
+            order!
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+          >
             <input
               type="email"
               value={email}
@@ -49,7 +53,8 @@ export function Newsletter() {
           </form>
 
           <p className="mt-4 text-xs text-primary-foreground/60">
-            By subscribing, you agree to our Privacy Policy and consent to receive updates.
+            By subscribing, you agree to our Privacy Policy and consent to
+            receive updates.
           </p>
         </div>
       </div>

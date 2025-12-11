@@ -60,7 +60,7 @@ export function InstaFeed() {
             </span> 
           </div>
           <h2 className="text-3xl font-display font-bold text-foreground">
-            Follow Us on Instagram 2
+            Follow Us on Instagram
           </h2>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
             Join our community of skincare enthusiasts. Tag us in your photos to

@@ -57,7 +57,7 @@ export function InstaFeed() {
             <Instagram className="h-6 w-6" />
             <span className="font-semibold tracking-wide uppercase">
               @VMSkinCare
-            </span> <span className="text-muted-foreground">.</span>
+            </span> 
           </div>
           <h2 className="text-3xl font-display font-bold text-foreground">
             Follow Us on Instagram

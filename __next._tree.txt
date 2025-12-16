@@ -1,0 +1,8 @@
+:HL["/_next/static/chunks/652071472ff63a08.css","style"]
+:HL["/_next/static/media/logo.eef88e4f.png","image"]
+:HL["https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800","image"]
+:HL["https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400","image"]
+:HL["https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400","image"]
+:HL["https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400","image"]
+:HL["https://images.unsplash.com/photo-1556227702-d1e4e7b5c232?w=400","image"]
+0:{"buildId":"xJMDZgytMko0fiUZfwG5C","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"staleTime":300}

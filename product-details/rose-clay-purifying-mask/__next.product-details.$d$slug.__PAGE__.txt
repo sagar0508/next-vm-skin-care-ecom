@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[94459,["/_next/static/chunks/19a0f348f79493fc.js","/_next/static/chunks/0a97f3c1907e694e.js"],"ProductDetailClient"]
+3:I[97367,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/247eb132b7f7b574.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+0:{"buildId":"xJMDZgytMko0fiUZfwG5C","rsc":["$","$1","c",{"children":[["$","$L2",null,{"slug":"rose-clay-purifying-mask"}],[["$","script","script-0",{"src":"/_next/static/chunks/19a0f348f79493fc.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/0a97f3c1907e694e.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"loading":null,"isPartial":false}
+5:null

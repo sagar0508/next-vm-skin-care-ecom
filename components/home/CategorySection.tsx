@@ -1,7 +1,11 @@
 import Link from "next/link";
-import { categories } from "@/data/mockData";
+import { Category } from "@/types";
 
-export function CategorySection() {
+interface CategorySectionProps {
+  categories: Category[];
+}
+
+export function CategorySection({ categories }: CategorySectionProps) {
   return (
     <section className="px-4 py-16 bg-background">
       <div className="container mx-auto max-w-7xl">

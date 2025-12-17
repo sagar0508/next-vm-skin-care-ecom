@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     "Korean Skin Care Products, and Korean Beauty Products, Korean Glass Treatment",
 };
 
+import StoreProvider from "@/redux/StoreProvider";
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,7 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased font-sans`}>{children}</body>
+      <body className={`antialiased font-sans`}>
+        <StoreProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </StoreProvider>
+      </body>
     </html>
   );
 }

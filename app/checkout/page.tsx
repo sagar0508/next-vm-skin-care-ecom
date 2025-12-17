@@ -16,6 +16,8 @@ import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/data/mockData";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useRazorpay } from "@/hooks/useRazorpay";
+import axios from "axios";
 
 type CheckoutStep = "address" | "shipping" | "payment";
 
@@ -93,24 +95,78 @@ const Checkout = () => {
     setCurrentStep("payment");
   };
 
+  const { displayRazorpay } = useRazorpay();
+
   const handlePayment = async () => {
     setIsProcessing(true);
 
-    // Simulate Razorpay payment
-    toast.info("Redirecting to payment...", {
-      description: "This is a demo - no actual payment will be processed",
-    });
+    try {
+      // 1. Create Order via API
+      const orderRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}orders/create`,
+        {
+          items: cart.items,
+          shippingAddress: address,
+          shippingMethod: selectedShipping,
+          total: cart.total,
+        }
+      );
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      const { id: order_id, currency, amount } = orderRes.data;
 
-    // Simulate successful payment
-    clearCart();
-    toast.success("Order placed successfully!", {
-      description: "You will receive a confirmation on WhatsApp",
-    });
+      // 2. Open Razorpay
+      await displayRazorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "", // Add this to env
+        amount: amount.toString(),
+        currency: currency,
+        name: "VM Skin Care",
+        description: "Transaction for Order #" + order_id,
+        image: "https://your-logo-url.com/logo.png", // Replace with valid logo URL
+        order_id: order_id,
+        handler: async (response: any) => {
+          try {
+            // 3. Verify Payment
+            const verifyRes = await axios.post(
+              `${process.env.NEXT_PUBLIC_BASE_URL}payment/razorpay/verify`,
+              {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              }
+            );
 
-    router.push("/order-success");
-    setIsProcessing(false);
+            if (verifyRes.data.success) {
+              clearCart();
+              toast.success("Order placed successfully!", {
+                description: "You will receive a confirmation on WhatsApp",
+              });
+              router.push("/order-success");
+            } else {
+              toast.error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Verification Error:", error);
+            toast.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: address.name,
+          email: "user@example.com", // This should come from auth/user state
+          contact: address.phone,
+        },
+        notes: {
+          address: `${address.line1}, ${address.city}, ${address.state}`,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      });
+    } catch (error) {
+      console.error("Payment Error:", error);
+      toast.error("Failed to initiate payment. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (cart.items.length === 0) {

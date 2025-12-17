@@ -17,18 +17,22 @@ import { Layout } from "@/components/layout/Layout";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
-import { products, formatPrice, reviews } from "@/data/mockData";
+import { products as mockProducts, formatPrice } from "@/data/mockData";
 import { useCartStore } from "@/store/cartStore";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Product, Review } from "@/types";
 
 interface ProductDetailClientProps {
-  slug: string;
+  product: Product;
+  reviews: Review[];
 }
 
-export const ProductDetailClient = ({ slug }: ProductDetailClientProps) => {
+export const ProductDetailClient = ({
+  product,
+  reviews,
+}: ProductDetailClientProps) => {
   const router = useRouter();
-  const product = products.find((p) => p.slug === slug);
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<
@@ -53,8 +57,8 @@ export const ProductDetailClient = ({ slug }: ProductDetailClientProps) => {
     );
   }
 
-  const productReviews = reviews.filter((r) => r.productId === product.id);
-  const relatedProducts = products
+  const productReviews = reviews;
+  const relatedProducts = mockProducts
     .filter((p) => p.category.id === product.category.id && p.id !== product.id)
     .slice(0, 4);
 
@@ -148,7 +152,7 @@ export const ProductDetailClient = ({ slug }: ProductDetailClientProps) => {
                     key={i}
                     className={cn(
                       "h-5 w-5",
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.rating.rate)
                         ? "fill-warning text-warning"
                         : "text-muted"
                     )}
@@ -156,7 +160,7 @@ export const ProductDetailClient = ({ slug }: ProductDetailClientProps) => {
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                {product.rating} ({product.reviewCount.toLocaleString()}{" "}
+                {product.rating.rate} ({product.rating.count.toLocaleString()}{" "}
                 reviews)
               </span>
             </div>

@@ -1,8 +1,10 @@
 import { Layout } from "@/components/layout/Layout";
-import { blogPosts } from "@/data/mockData";
 import { Calendar, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import fs from "fs";
+import path from "path";
+import { BlogPost } from "@/types";
 
 export const metadata = {
   title: "Blog - VM Skin Care",
@@ -10,7 +12,15 @@ export const metadata = {
     "Read our latest articles on skincare routines, ingredients, and beauty tips.",
 };
 
+const getBlogPosts = (): BlogPost[] => {
+  const filePath = path.join(process.cwd(), "data/blogs/blogs.json");
+  if (!fs.existsSync(filePath)) return [];
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(fileContents);
+};
+
 export default function BlogPage() {
+  const blogPosts = getBlogPosts();
   return (
     <Layout>
       <main className="min-h-screen bg-background pb-12">

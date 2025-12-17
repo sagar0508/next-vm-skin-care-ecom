@@ -127,10 +127,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
         <div className="mt-2 flex items-center gap-1">
           <div className="flex items-center gap-0.5 px-1.5 py-0.5 bg-success/10 text-success rounded text-xs font-semibold">
             <Star className="h-3 w-3 fill-current" />
-            {product.rating}
+            {product.rating.rate}
           </div>
           <span className="text-xs text-muted-foreground">
-            ({product.reviewCount.toLocaleString()})
+            ({product.rating.count.toLocaleString()})
           </span>
         </div>
 

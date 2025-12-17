@@ -1,12 +1,15 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { products, formatPrice } from "@/data/mockData";
+import { formatPrice } from "@/data/mockData"; // Keep formatPrice for now or move to utils
 import logo from "@/assets/logo.png";
 import Link from "next/link";
+import { Product } from "@/types";
 
-export function HeroSection() {
-  const featuredProduct = products.find((p) => p.featured);
+interface HeroSectionProps {
+  featuredProduct?: Product;
+}
 
+export function HeroSection({ featuredProduct }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-secondary via-background to-muted ">
       <div className="container py-8 lg:py-20 mx-auto max-w-7xl px-4">
@@ -15,7 +18,7 @@ export function HeroSection() {
           <div className="space-y-6 animate-slide-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
               <Sparkles className="h-4 w-4" />
-              Premium Skincare Collection
+              Premium Collection
             </div>
 
             <div className="flex items-center gap-4 mb-4">
@@ -23,14 +26,13 @@ export function HeroSection() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight">
-              Unlock Your
-              <span className="text-primary block">Natural Glow</span>
+              Discover Your
+              <span className="text-primary block">Perfect Style</span>
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg">
-              Discover our curated collection of premium skincare products.
-              Transform your skin with science-backed formulas crafted for
-              radiant, healthy skin.
+              Explore our curated collection of premium products. Find exactly
+              what you need with quality you can trust.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -39,9 +41,6 @@ export function HeroSection() {
                   Shop Now
                   <ArrowRight className="h-5 w-5" />
                 </Link>
-              </Button>
-              <Button variant="outline" size="xl" asChild>
-                <Link href="/category/skincare">Explore Skincare</Link>
               </Button>
             </div>
 

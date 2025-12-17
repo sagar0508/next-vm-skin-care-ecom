@@ -5,9 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
-import { categories } from "@/data/mockData";
 import { cn } from "@/lib/utils";
-import { Product } from "@/types";
+import { Product, Category } from "@/types";
 
 const sortOptions = [
   { value: "newest", label: "Newest First" },
@@ -27,9 +26,13 @@ const priceRanges = [
 
 interface ProductListingProps {
   initialProducts: Product[];
+  categories: Category[];
 }
 
-export const ProductListing = ({ initialProducts }: ProductListingProps) => {
+export const ProductListing = ({
+  initialProducts,
+  categories,
+}: ProductListingProps) => {
   const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
@@ -62,7 +65,7 @@ export const ProductListing = ({ initialProducts }: ProductListingProps) => {
 
   if (selectedRating) {
     filteredProducts = filteredProducts.filter(
-      (p) => p.rating >= selectedRating
+      (p) => p.rating.rate >= selectedRating
     );
   }
 
@@ -74,9 +77,9 @@ export const ProductListing = ({ initialProducts }: ProductListingProps) => {
       case "price-desc":
         return b.price - a.price;
       case "rating":
-        return b.rating - a.rating;
+        return b.rating.rate - a.rating.rate;
       case "popular":
-        return b.reviewCount - a.reviewCount;
+        return b.rating.count - a.rating.count;
       default:
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

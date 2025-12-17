@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rev-1",
+    "productId": "1",
+    "userId": "user-1",
+    "userName": "Priya Sharma",
+    "rating": 5,
+    "title": "Amazing results!",
+    "content": "Great bag, fits my laptop perfectly.",
+    "helpful": 234,
+    "verified": true,
+    "createdAt": "2024-03-01"
+  },
+  {
+    "id": "rev-2",
+    "productId": "1",
+    "userId": "user-2",
+    "userName": "Neha Patel",
+    "rating": 4,
+    "title": "Good quality",
+    "content": "Solid material, but the straps could be more padded.",
+    "helpful": 156,
+    "verified": true,
+    "createdAt": "2024-02-28"
+  },
+  {
+    "id": "rev-3",
+    "productId": "5",
+    "userId": "user-3",
+    "userName": "Ananya Singh",
+    "rating": 5,
+    "title": "Stunning piece",
+    "content": "Looks exactly like the picture. Very heavy and feels premium.",
+    "helpful": 412,
+    "verified": true,
+    "createdAt": "2024-03-05"
+  }
+]

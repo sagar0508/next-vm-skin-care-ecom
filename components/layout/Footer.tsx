@@ -185,7 +185,8 @@ export function Footer() {
         <div className="container py-6 mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-background/60">
-              © 2024 VM Skin Care. All rights reserved.
+              &copy; {new Date().getFullYear()} VM Skin Care. All rights
+              reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-background/60">
               <Link

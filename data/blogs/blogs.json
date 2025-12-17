@@ -1,0 +1,32 @@
+[
+  {
+    "id": "blog-1",
+    "title": "The Ultimate Guide to Mens Fashion",
+    "excerpt": "Discover the step-by-step guide to dressing sharp.",
+    "content": "Content placeholder...",
+    "image": "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_t.png",
+    "author": "Dr. Style",
+    "date": "2024-03-15",
+    "slug": "ultimate-guide-mens-fashion",
+    "tags": [
+      "fashion",
+      "men",
+      "style"
+    ]
+  },
+  {
+    "id": "blog-2",
+    "title": "Jewelry Care 101",
+    "excerpt": "How to keep your silver and gold shining.",
+    "content": "Content placeholder...",
+    "image": "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_t.png",
+    "author": "Sarah Chen",
+    "date": "2024-03-10",
+    "slug": "jewelry-care-101",
+    "tags": [
+      "jewelry",
+      "care",
+      "tips"
+    ]
+  }
+]

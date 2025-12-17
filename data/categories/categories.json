@@ -1,0 +1,34 @@
+[
+  {
+    "id": "cat-electronics",
+    "name": "electronics",
+    "slug": "electronics",
+    "description": "Browse our collection of electronics",
+    "image": "https://source.unsplash.com/400x400/?electronics",
+    "children": []
+  },
+  {
+    "id": "cat-jewelery",
+    "name": "jewelery",
+    "slug": "jewelery",
+    "description": "Browse our collection of jewelery",
+    "image": "https://source.unsplash.com/400x400/?jewelery",
+    "children": []
+  },
+  {
+    "id": "cat-men's-clothing",
+    "name": "men's clothing",
+    "slug": "men's-clothing",
+    "description": "Browse our collection of men's clothing",
+    "image": "https://source.unsplash.com/400x400/?men's,clothing",
+    "children": []
+  },
+  {
+    "id": "cat-women's-clothing",
+    "name": "women's clothing",
+    "slug": "women's-clothing",
+    "description": "Browse our collection of women's clothing",
+    "image": "https://source.unsplash.com/400x400/?women's,clothing",
+    "children": []
+  }
+]

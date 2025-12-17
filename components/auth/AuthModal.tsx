@@ -18,6 +18,9 @@ import {
 import { toast } from "sonner";
 import { Phone, ArrowRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { sendOtp, verifyOtp } from "@/redux/slice/authSlice";
+import { AppDispatch } from "@/redux/store"; // Assuming store exports AppDispatch
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -33,6 +36,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length < 10) {
@@ -41,12 +46,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
 
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await dispatch(sendOtp({ phone })).unwrap();
       setLoading(false);
       setStep("OTP");
-      toast.success("OTP sent successfully!");
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      // Toast handled in slice
+    }
   };
 
   const handleVerifyOtp = async () => {
@@ -56,10 +63,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
 
     setLoading(true);
-    // Simulate API verification
-    setTimeout(() => {
+    try {
+      await dispatch(verifyOtp({ phone, otp })).unwrap();
       setLoading(false);
-      toast.success("Successfully logged in!");
       router.push("/account");
       onClose();
       // Reset state after close
@@ -68,7 +74,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setPhone("");
         setOtp("");
       }, 300);
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      // Toast handled in slice
+    }
   };
 
   return (

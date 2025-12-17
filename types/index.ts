@@ -36,7 +36,7 @@ export interface Product {
   brand?: string;
   variants: ProductVariant[];
   attributes: Record<string, string[]>;
-  rating: number;
+  rating: { rate: number; count: number };
   reviewCount: number;
   tags: string[];
   inStock: boolean;

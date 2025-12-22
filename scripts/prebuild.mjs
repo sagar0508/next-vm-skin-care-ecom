@@ -9,7 +9,7 @@ async function prebuild() {
   console.log("Starting prebuild: Fetching products...");
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/products`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

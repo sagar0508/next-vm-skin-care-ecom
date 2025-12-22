@@ -62,10 +62,10 @@ export const login = createAsyncThunk(
 
 export const sendOtp = createAsyncThunk(
   "auth/sendOtp",
-  async (data: { phone: string }, thunkAPI) => {
+  async (data: { phone_number: string }, thunkAPI) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}auth/send-otp`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/otp/send`,
         data
       );
       if (response.status === 200) {
@@ -81,10 +81,10 @@ export const sendOtp = createAsyncThunk(
 
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
-  async (data: { phone: string; otp: string }, thunkAPI) => {
+  async (data: { phone_number: string; otp: string }, thunkAPI) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}auth/verify-otp`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/otp/verify`,
         data
       );
       if (response.status === 200) {

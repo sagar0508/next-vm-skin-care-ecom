@@ -25,13 +25,14 @@ import { AppDispatch } from "@/redux/store"; // Assuming store exports AppDispat
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 type Step = "PHONE" | "OTP";
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [step, setStep] = useState<Step>("PHONE");
-  const [phone, setPhone] = useState("");
+  const [phone_number, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -40,14 +41,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length < 10) {
+    if (phone_number.length < 10) {
       toast.error("Please enter a valid phone number");
       return;
     }
 
     setLoading(true);
     try {
-      await dispatch(sendOtp({ phone })).unwrap();
+      await dispatch(sendOtp({ phone_number })).unwrap();
       setLoading(false);
       setStep("OTP");
     } catch (error) {
@@ -64,9 +65,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     setLoading(true);
     try {
-      await dispatch(verifyOtp({ phone, otp })).unwrap();
+      await dispatch(verifyOtp({ phone_number, otp })).unwrap();
       setLoading(false);
-      router.push("/account");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push("/account");
+      }
       onClose();
       // Reset state after close
       setTimeout(() => {
@@ -90,7 +95,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <DialogDescription className="text-center">
             {step === "PHONE"
               ? "Enter your mobile number to continue"
-              : `We sent a code to +91 ${phone}`}
+              : `We sent a code to +91 ${phone_number}`}
           </DialogDescription>
         </DialogHeader>
 
@@ -103,7 +108,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   type="tel"
                   placeholder="Enter Mobile Number"
                   className="pl-9"
-                  value={phone}
+                  value={phone_number}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, "");
                     if (value.length <= 10) setPhone(value);
@@ -113,7 +118,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loading || phone.length < 10}
+                disabled={loading || phone_number.length < 10}
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

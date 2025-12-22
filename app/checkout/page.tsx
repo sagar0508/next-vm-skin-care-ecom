@@ -18,6 +18,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 type CheckoutStep = "address" | "shipping" | "payment";
 
@@ -58,6 +61,8 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [selectedShipping, setSelectedShipping] = useState("standard");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
   const [address, setAddress] = useState({
     name: "",
@@ -92,6 +97,11 @@ const Checkout = () => {
     if (option) {
       setShipping(option.price);
     }
+
+    if (!isLoggedIn) {
+      setIsAuthOpen(true);
+      return;
+    }
     setCurrentStep("payment");
   };
 
@@ -99,11 +109,11 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-
+    console.log("handlePayment");
     try {
       // 1. Create Order via API
       const orderRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}orders/create`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/app/orders/checkout`,
         {
           items: cart.items,
           shippingAddress: address,
@@ -525,6 +535,14 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={() => {
+          setIsAuthOpen(false);
+          setCurrentStep("payment");
+        }}
+      />
     </Layout>
   );
 };

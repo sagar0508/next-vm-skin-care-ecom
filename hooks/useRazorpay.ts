@@ -48,6 +48,7 @@ export const useRazorpay = () => {
   };
 
   const displayRazorpay = async (options: RazorpayOptions) => {
+    console.log("options--", options);
     const res = await loadRazorpay();
 
     if (!res) {

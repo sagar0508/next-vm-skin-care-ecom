@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { toast } from "sonner";
-import { Phone, ArrowRight, Loader2 } from "lucide-react";
+import { Phone, ArrowRight, Loader2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { sendOtp, verifyOtp } from "@/redux/slice/authSlice";
@@ -26,18 +26,31 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  preFilledPhone?: string;
 }
 
 type Step = "PHONE" | "OTP";
 
-export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
+export function AuthModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  preFilledPhone,
+}: AuthModalProps) {
   const [step, setStep] = useState<Step>("PHONE");
-  const [phone_number, setPhone] = useState("");
+  const [phone_number, setPhone] = useState(preFilledPhone || "");
+  const [name, setName] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    if (preFilledPhone) {
+      setPhone(preFilledPhone);
+    }
+  }, [preFilledPhone]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +78,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     setLoading(true);
     try {
-      await dispatch(verifyOtp({ phone_number, otp })).unwrap();
+      await dispatch(verifyOtp({ phone_number, otp, name })).unwrap();
       setLoading(false);
       if (onSuccess) {
         onSuccess();
@@ -77,6 +90,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       setTimeout(() => {
         setStep("PHONE");
         setPhone("");
+        setName("");
         setOtp("");
       }, 300);
     } catch (error) {
@@ -102,6 +116,17 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         <div className="flex flex-col gap-6 py-4">
           {step === "PHONE" ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Enter Full Name"
+                  className="pl-9"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input

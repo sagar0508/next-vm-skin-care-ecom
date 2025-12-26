@@ -1,17 +1,14 @@
 "use client";
 import { useCartStore } from "@/store/cartStore";
-import {
-  Menu,
-  Search,
-  ShoppingBag,
-  User,
-  X
-} from "lucide-react";
+import { Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useState } from "react";
 // import { useWishlistStore } from "@/store/wishlistStore";
 import logo from "@/assets/logo.png";
 import { AuthModal } from "@/components/auth/AuthModal";
 import Link from "next/link";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +16,8 @@ export function Header() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const { cart } = useCartStore();
   // const { items: wishlistItems } = useWishlistStore();
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
 
   const cartItemCount = cart.items.reduce(
     (sum, item) => sum + item.quantity,
@@ -168,7 +167,13 @@ export function Header() {
               <User className="h-5 w-5" />
             </Link> */}
             <button
-              onClick={() => setIsAuthOpen(true)}
+              onClick={() => {
+                if (isLoggedIn) {
+                  router.push("/account");
+                } else {
+                  setIsAuthOpen(true);
+                }
+              }}
               className="hidden sm:block p-2 hover:bg-muted rounded-lg transition-colors"
             >
               <User className="h-5 w-5" />

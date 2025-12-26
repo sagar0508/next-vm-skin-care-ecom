@@ -1,10 +1,36 @@
-import { CheckCircle, Package, MessageCircle, ArrowRight } from "lucide-react";
+'use client';
+import {
+  CheckCircle,
+  Package,
+  MessageCircle,
+  ArrowRight,
+  MapPin,
+  CreditCard,
+} from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { formatPrice } from "@/data/mockData";
 
 const OrderSuccess = () => {
-  const orderId = `ORD${Date.now().toString().slice(-8)}`;
+  const searchParams = useSearchParams();
+  const urlOrderId = searchParams.get("orderId");
+  const [orderData, setOrderData] = useState<any>(null);
+
+  useEffect(() => {
+    const savedOrder = sessionStorage.getItem("lastOrder");
+    if (savedOrder) {
+      try {
+        setOrderData(JSON.parse(savedOrder));
+      } catch (e) {
+        console.error("Failed to parse order data", e);
+      }
+    }
+  }, []);
+
+  const displayOrderId = orderData?.orderId || urlOrderId || "ORD-UNKNOWN";
 
   return (
     <Layout>
@@ -34,9 +60,77 @@ const OrderSuccess = () => {
           >
             <p className="text-sm text-muted-foreground">Order ID</p>
             <p className="text-xl font-mono font-bold text-foreground">
-              {orderId}
+              {displayOrderId}
             </p>
           </div>
+
+          {/* Order Details Summary */}
+          {orderData && (
+            <div
+              className="mt-8 w-full max-w-2xl mx-auto text-left space-y-6 animate-slide-up"
+              style={{ animationDelay: "250ms" }}
+            >
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Items Summary */}
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Package className="h-4 w-4" /> Items Ordered
+                  </h3>
+                  <div className="space-y-3">
+                    {orderData.items?.map((item: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="flex justify-between items-center text-sm"
+                      >
+                        <span className="text-foreground font-medium">
+                          {item.name}{" "}
+                          <span className="text-muted-foreground text-xs">
+                            x{item.quantity}
+                          </span>
+                        </span>
+                        <span className="text-foreground font-semibold">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="pt-3 border-t border-border flex justify-between items-center font-bold">
+                      <span>Total Paid</span>
+                      <span className="text-primary">
+                        {formatPrice(orderData.totalAmount)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shipping & Payment */}
+                <div className="bg-card border border-border rounded-xl p-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" /> Shipping Address
+                  </h3>
+                  <div className="text-sm text-foreground space-y-1">
+                    <p className="font-bold">
+                      {orderData.shippingAddress?.name}
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {orderData.shippingAddress?.addressLine1}
+                      {orderData.shippingAddress?.addressLine2 &&
+                        `, ${orderData.shippingAddress.addressLine2}`}
+                      <br />
+                      {orderData.shippingAddress?.city},{" "}
+                      {orderData.shippingAddress?.state} -{" "}
+                      {orderData.shippingAddress?.pincode}
+                    </p>
+                    <p className="pt-2 flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <span className="capitalize">
+                        {orderData.paymentDetails?.method} Payment
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* What's Next */}
           <div

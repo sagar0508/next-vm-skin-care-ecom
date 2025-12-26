@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronRight,
@@ -21,6 +21,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { AuthModal } from "@/components/auth/AuthModal";
+import axiosBaseURL from "@/axios";
 
 type CheckoutStep = "address" | "shipping" | "payment";
 
@@ -61,18 +62,66 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("address");
   const [selectedShipping, setSelectedShipping] = useState("standard");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, userDetails } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const [address, setAddress] = useState({
     name: "",
-    phone: "",
-    line1: "",
-    line2: "",
+    phone_number: "",
+    addressLine1: "",
+    addressLine2: "",
     city: "",
     state: "",
-    postalCode: "",
+    pincode: "",
+    country: "",
   });
+
+  useEffect(() => {
+    if (isLoggedIn && userDetails) {
+      setAddress((prev) => ({
+        ...prev,
+        name: prev.name || userDetails.name || "",
+        phone_number: prev.phone_number || userDetails.phone_number || "",
+      }));
+    }
+  }, [isLoggedIn, userDetails]);
+
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPincodeDetails = async () => {
+      if (address.pincode.length === 6) {
+        setIsPincodeLoading(true);
+        try {
+          const response = await axios.get(
+            `https://api.postalpincode.in/pincode/${address.pincode}`
+          );
+          if (response.data?.[0]?.Status === "Success") {
+            const details = response.data[0].PostOffice[0];
+            setAddress((prev) => ({
+              ...prev,
+              city: details.District,
+              state: details.State,
+              country: details.Country,
+            }));
+            toast.success("Address auto-filled from pincode");
+          } else {
+            toast.error("Invalid pincode or details not found");
+          }
+        } catch (error) {
+          console.error("Pincode API Error:", error);
+          toast.error("Failed to fetch address details for this pincode");
+        } finally {
+          setIsPincodeLoading(false);
+        }
+      }
+    };
+
+    fetchPincodeDetails();
+  }, [address.pincode]);
 
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep);
 
@@ -80,15 +129,23 @@ const Checkout = () => {
     e.preventDefault();
     if (
       !address.name ||
-      !address.phone ||
-      !address.line1 ||
+      !address.phone_number ||
+      !address.addressLine1 ||
       !address.city ||
       !address.state ||
-      !address.postalCode
+      !address.pincode
     ) {
       toast.error("Please fill in all required fields");
       return;
     }
+
+    // Pincode validation: 6 digits and numeric
+    const pincodeRegex = /^\d{6}$/;
+    if (!pincodeRegex.test(address.pincode)) {
+      toast.error("Please enter a valid 6-digit PIN code");
+      return;
+    }
+
     setCurrentStep("shipping");
   };
 
@@ -112,45 +169,61 @@ const Checkout = () => {
     console.log("handlePayment");
     try {
       // 1. Create Order via API
-      const orderRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/app/orders/checkout`,
-        {
-          items: cart.items,
-          shippingAddress: address,
-          shippingMethod: selectedShipping,
-          total: cart.total,
-        }
+
+      const { items, total, couponCode } = cart;
+
+      const normalizedItems = items.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+      }));
+      const payload = {
+        items: normalizedItems,
+        shippingAddress: address,
+        // shippingMethod: selectedShipping,
+        // total,
+        couponCode,
+      };
+
+      const orderRes = await axiosBaseURL.post(`/orders/checkout`, payload);
+
+      const { orderId, currency, totalAmount, razorpayOrderId } =
+        orderRes.data?.data;
+
+      console.log(
+        "orderRes--",
+        orderRes?.data?.data,
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
       );
-
-      const { id: order_id, currency, amount } = orderRes.data;
-
       // 2. Open Razorpay
       await displayRazorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "", // Add this to env
-        amount: amount.toString(),
-        currency: currency,
+        amount: Math.round(Number(totalAmount) * 100).toString(),
+        currency: Array.isArray(currency) ? currency[0] : currency || "INR",
         name: "VM Skin Care",
-        description: "Transaction for Order #" + order_id,
-        image: "https://your-logo-url.com/logo.png", // Replace with valid logo URL
-        order_id: order_id,
+        description: "Transaction for Order #" + orderId,
+        // image: "https://your-logo-url.com/logo.png", // Replace with valid logo URL
+        order_id: razorpayOrderId,
         handler: async (response: any) => {
           try {
+            console.log("response--payment", response);
             // 3. Verify Payment
-            const verifyRes = await axios.post(
-              `${process.env.NEXT_PUBLIC_BASE_URL}payment/razorpay/verify`,
-              {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-              }
-            );
+            const verifyRes = await axiosBaseURL.post(`/payments/verify`, {
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
+            });
 
-            if (verifyRes.data.success) {
-              clearCart();
+            console.log("verifyRes", verifyRes);
+            if (verifyRes?.data?.code === 200) {
+              setIsSuccess(true);
+              const orderData = verifyRes.data.data;
+              sessionStorage.setItem("lastOrder", JSON.stringify(orderData));
               toast.success("Order placed successfully!", {
                 description: "You will receive a confirmation on WhatsApp",
               });
-              router.push("/order-success");
+              router.push(`/order-success?orderId=${orderData.orderId}`);
+              clearCart();
             } else {
               toast.error("Payment verification failed");
             }
@@ -161,11 +234,11 @@ const Checkout = () => {
         },
         prefill: {
           name: address.name,
-          email: "user@example.com", // This should come from auth/user state
-          contact: address.phone,
+          email: userDetails?.email || "user@example.com",
+          contact: address.phone_number,
         },
         notes: {
-          address: `${address.line1}, ${address.city}, ${address.state}`,
+          address: `${address.addressLine1}, ${address.city}, ${address.state}`,
         },
         theme: {
           color: "#3399cc",
@@ -179,7 +252,7 @@ const Checkout = () => {
     }
   };
 
-  if (cart.items.length === 0) {
+  if (cart.items.length === 0 && !isSuccess) {
     router.push("/cart");
     return null;
   }
@@ -252,6 +325,7 @@ const Checkout = () => {
                         }
                         className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                         required
+                        placeholder="Enter your name"
                       />
                     </div>
                     <div>
@@ -260,12 +334,16 @@ const Checkout = () => {
                       </label>
                       <input
                         type="tel"
-                        value={address.phone}
+                        value={address.phone_number}
                         onChange={(e) =>
-                          setAddress({ ...address, phone: e.target.value })
+                          setAddress({
+                            ...address,
+                            phone_number: e.target.value,
+                          })
                         }
                         className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                         required
+                        placeholder="Enter your phone number"
                       />
                     </div>
                   </div>
@@ -276,9 +354,12 @@ const Checkout = () => {
                     </label>
                     <input
                       type="text"
-                      value={address.line1}
+                      value={address.addressLine1}
                       onChange={(e) =>
-                        setAddress({ ...address, line1: e.target.value })
+                        setAddress({
+                          ...address,
+                          addressLine1: e.target.value,
+                        })
                       }
                       placeholder="House no., Building, Street"
                       className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
@@ -292,9 +373,12 @@ const Checkout = () => {
                     </label>
                     <input
                       type="text"
-                      value={address.line2}
+                      value={address.addressLine2}
                       onChange={(e) =>
-                        setAddress({ ...address, line2: e.target.value })
+                        setAddress({
+                          ...address,
+                          addressLine2: e.target.value,
+                        })
                       }
                       placeholder="Landmark, Area (Optional)"
                       className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
@@ -302,48 +386,72 @@ const Checkout = () => {
                   </div>
 
                   <div className="grid sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1.5">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        value={address.city}
-                        onChange={(e) =>
-                          setAddress({ ...address, city: e.target.value })
-                        }
-                        className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1.5">
-                        State *
-                      </label>
-                      <input
-                        type="text"
-                        value={address.state}
-                        onChange={(e) =>
-                          setAddress({ ...address, state: e.target.value })
-                        }
-                        className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                        required
-                      />
-                    </div>
-                    <div>
+                    <div
+                      className={
+                        !(address.city && address.state) ? "sm:col-span-3" : ""
+                      }
+                    >
                       <label className="block text-sm font-medium text-foreground mb-1.5">
                         PIN Code *
                       </label>
-                      <input
-                        type="text"
-                        value={address.postalCode}
-                        onChange={(e) =>
-                          setAddress({ ...address, postalCode: e.target.value })
-                        }
-                        className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                        required
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={address.pincode}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === "" || /^\d+$/.test(value)) {
+                              setAddress({ ...address, pincode: value });
+                            }
+                          }}
+                          className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                          required
+                          maxLength={6}
+                          placeholder="Enter your pincode"
+                        />
+                        {isPincodeLoading && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    {address.city && address.state && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-1.5">
+                            City *
+                          </label>
+                          <input
+                            type="text"
+                            disabled
+                            value={address.city}
+                            onChange={(e) =>
+                              setAddress({ ...address, city: e.target.value })
+                            }
+                            className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                            required
+                            placeholder="Enter your city"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-foreground mb-1.5">
+                            State *
+                          </label>
+                          <input
+                            type="text"
+                            disabled
+                            value={address.state}
+                            onChange={(e) =>
+                              setAddress({ ...address, state: e.target.value })
+                            }
+                            className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                            required
+                            placeholder="Enter your state"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <Button
@@ -351,6 +459,7 @@ const Checkout = () => {
                     variant="hero"
                     size="lg"
                     className="w-full mt-6"
+                    disabled={isPincodeLoading}
                   >
                     Continue to Shipping
                   </Button>
@@ -542,6 +651,7 @@ const Checkout = () => {
           setIsAuthOpen(false);
           setCurrentStep("payment");
         }}
+        preFilledPhone={address?.phone_number}
       />
     </Layout>
   );

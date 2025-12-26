@@ -81,7 +81,10 @@ export const sendOtp = createAsyncThunk(
 
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
-  async (data: { phone_number: string; otp: string }, thunkAPI) => {
+  async (
+    data: { phone_number: string; otp: string; name?: string },
+    thunkAPI
+  ) => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/auth/otp/verify`,
@@ -92,6 +95,7 @@ export const verifyOtp = createAsyncThunk(
         return response.data;
       }
     } catch (error: any) {
+      console.log("error", error);
       toast.error(error.response?.data?.message || "Invalid OTP");
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
@@ -128,7 +132,7 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
 
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_URL}auth/logout`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`,
       { refreshToken }
     );
 

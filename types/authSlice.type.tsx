@@ -8,6 +8,7 @@ export interface UserDetailsProps {
   userName: string;
   lastLogin: string;
   email: string;
+  phone_number?: string;
   role: string;
   socialToken: string | boolean; // It's "false" as a string in your example but could also be a boolean
   isEmailVerified: boolean;

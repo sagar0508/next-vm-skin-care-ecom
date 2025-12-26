@@ -1,10 +1,28 @@
+"use client";
+
 import { Layout } from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Package, MapPin, Edit2 } from "lucide-react";
+import { User, Package, MapPin, Edit2, LogOut, Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { logout } from "@/redux/slice/authSlice";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 const mockOrders = [
   {
@@ -49,12 +67,74 @@ const mockAddresses = [
 ];
 
 export default function Account() {
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const { userDetails } = useSelector((state: RootState) => state.auth);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(logout());
+      if (logout.fulfilled.match(response)) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12 max-w-7xl">
-        <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-8">
-          My Account
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+            My Account
+          </h1>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20 cursor-pointer"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to logout?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will end your current session and you will need to login
+                  again to access your account.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="cursor-pointer">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <LogOut className="h-4 w-4 mr-2" />
+                  )}
+                  Logout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
 
         <Tabs defaultValue="profile" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
@@ -86,29 +166,30 @@ export default function Account() {
                   </div>
                   <div>
                     <h3 className="font-display text-xl font-semibold">
-                      Priya Sharma
+                      {userDetails?.name || "User Name"}
                     </h3>
                     <p className="text-muted-foreground">
-                      priya.sharma@email.com
+                      {userDetails?.email || "user@email.com"}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="Priya" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Sharma" />
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      defaultValue={userDetails?.name || ""}
+                      readOnly
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      defaultValue="priya.sharma@email.com"
+                      defaultValue={userDetails?.email || ""}
+                      readOnly
                     />
                   </div>
                   <div className="space-y-2">
@@ -117,9 +198,11 @@ export default function Account() {
                   </div>
                 </div>
 
-                <Button className="bg-primary hover:bg-primary/90">
-                  Save Changes
-                </Button>
+                <div className="flex gap-4">
+                  <Button className="bg-primary hover:bg-primary/90">
+                    Save Changes
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

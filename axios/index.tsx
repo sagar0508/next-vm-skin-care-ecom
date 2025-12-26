@@ -18,7 +18,7 @@ function bypassInterceptorForRefreshRequest(
   config: InternalAxiosRequestConfig
 ): InternalAxiosRequestConfig {
   // Check if this is a "refresh" API request (you can adjust the condition as needed)
-  if (config.url === "auth/refresh-tokens" && config.method === "post") {
+  if (config.url === "/auth/refresh-tokens" && config.method === "post") {
     console.log("config.url= ", config.url, config.method);
 
     // Remove the response interceptor temporarily
@@ -43,10 +43,12 @@ const axiosInterceptorRequest = axiosBaseURL.interceptors.request.use(
 
 export const logOutRequest = async (refreshToken: string) => {
   try {
-    const response = await axiosBaseURL.post("auth/logout", {
+    const response = await axiosBaseURL.post("/auth/logout", {
       refreshToken,
     });
-    if (response?.status === 204) {
+    console.log("response2", response?.data?.code);
+    if (response?.data?.code === 204 || response?.data?.code === 200) {
+      console.log("response2-inner", response?.data?.code);
       reduxStorage.dispatch(setLogOut());
     }
     console.log("response3", response);
@@ -61,7 +63,7 @@ export const logOutRequest = async (refreshToken: string) => {
 export const refreshTokenRequest = async (refreshToken: string) => {
   try {
     const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-    const response = await axios.post(`${baseURL}auth/refresh-tokens`, {
+    const response = await axios.post(`${baseURL}/auth/refresh-tokens`, {
       refreshToken,
     });
 
@@ -86,6 +88,7 @@ axiosBaseURL.interceptors.response.use(
     return response;
   },
   async (error: any) => {
+    console.log("error==2", error);
     if (
       error.response?.data?.code === 400 ||
       error.response?.data?.code === 404 ||
